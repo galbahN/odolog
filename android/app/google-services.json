@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "93803328175",
+    "project_id": "odolog-v1",
+    "storage_bucket": "odolog-v1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93803328175:android:20b1453752b239a1abda5a",
+        "android_client_info": {
+          "package_name": "com.example.odolog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXZx9TMkgZfXThwD-n-PVUT0VqP5XolQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
