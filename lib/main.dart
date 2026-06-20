@@ -1,3 +1,4 @@
+import 'login_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OdoLog',
       debugShowCheckedModeBanner: false,
-      home: const AuthTestScreen(),
+      home: const LoginScreen(),
     );
   }
 }
