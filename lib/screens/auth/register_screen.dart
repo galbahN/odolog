@@ -1,4 +1,7 @@
+import 'role_selection_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,6 +17,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   String? _error;
+  bool _isLoading = false;
+
+  Future<void> _register() async {
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // Validation
+    if (name.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
+      setState(() => _error = 'Please fill in all fields');
+      return;
+    }
+    if (phone.length != 10 ||
+        !phone.startsWith('0') ||
+        !RegExp(r'^[0-9]+$').hasMatch(phone)) {
+      setState(
+        () => _error = 'Enter a valid 10-digit phone number (e.g. 0241234567)',
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(cred.user!.uid)
+          .set({
+            'name': name,
+            'phone': phone,
+            'email': email,
+            'role': null,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+      setState(() => _error = null);
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+        );
+      }
+      // Navigation to role selection comes in the next step
+    } catch (e) {
+      setState(() => _error = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +121,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.phone,
                 maxLength: 10,
                 style: const TextStyle(color: Colors.white),
-                decoration: _inputDecoration('Phone number (e.g. 0241234567)', Icons.phone_outlined)
-                    .copyWith(counterText: ''),
+                decoration: _inputDecoration(
+                  'Phone number (e.g. 0241234567)',
+                  Icons.phone_outlined,
+                ).copyWith(counterText: ''),
               ),
               const SizedBox(height: 16),
 
@@ -70,7 +133,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(color: Colors.white),
-                decoration: _inputDecoration('Email address', Icons.email_outlined),
+                decoration: _inputDecoration(
+                  'Email address',
+                  Icons.email_outlined,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -84,17 +150,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Icons.lock_outline,
                   suffix: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.white38,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
 
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+                Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                ),
               ],
 
               const SizedBox(height: 28),
@@ -103,14 +175,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {}, // logic comes next step
+                  onPressed: _isLoading
+                      ? null
+                      : _register, // logic comes next step
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4FC3F7),
                     foregroundColor: const Color(0xFF0D1B2A),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                  child: const Text('Create Account',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: Color(0xFF0D1B2A),
+                        )
+                      : const Text(
+                          'Create Account',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                 ),
               ),
 
@@ -122,7 +207,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String hint, IconData icon, {Widget? suffix}) {
+  InputDecoration _inputDecoration(
+    String hint,
+    IconData icon, {
+    Widget? suffix,
+  }) {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.white38),
