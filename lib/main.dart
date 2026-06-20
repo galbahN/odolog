@@ -1,6 +1,6 @@
+import 'auth_gate.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'screens/auth/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OdoLog',
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }
