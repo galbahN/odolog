@@ -1,6 +1,6 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import '../owner/add_driver_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -53,6 +53,12 @@ class OwnerDashboard extends StatelessWidget {
                   ),
                 ],
               ),
+
+              const SizedBox(height: 24),
+
+              const SizedBox(height: 24),
+
+              const _FleetStatsCard(),
 
               const SizedBox(height: 24),
 
@@ -124,7 +130,7 @@ class OwnerDashboard extends StatelessWidget {
                               radius: 18,
                               backgroundColor: const Color(
                                 0xFF4FC3F7,
-                              ).withOpacity(0.15),
+                              ).withValues(alpha: 0.15),
                               child: Text(
                                 (data['name'] ?? 'D')[0].toUpperCase(),
                                 style: const TextStyle(
@@ -162,10 +168,268 @@ class OwnerDashboard extends StatelessWidget {
                   );
                 },
               ),
+
+              const SizedBox(height: 24),
+
+              const _DriverPerformanceList(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FleetStatsCard extends StatelessWidget {
+  const _FleetStatsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final ownerUid = FirebaseAuth.instance.currentUser?.uid;
+    final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where('ownerId', isEqualTo: ownerUid)
+          .snapshots(),
+      builder: (context, driversSnapshot) {
+        final driverIds =
+            driversSnapshot.data?.docs.map((d) => d.id).toList() ?? [];
+
+        if (driverIds.isEmpty) {
+          return _buildCard(0, 0);
+        }
+
+        // Firestore 'whereIn' supports up to 30 values - fine for now
+        return StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('trips')
+              .where('driverId', whereIn: driverIds)
+              .where('date', isEqualTo: today)
+              .snapshots(),
+          builder: (context, tripsSnapshot) {
+            double earnings = 0;
+            if (tripsSnapshot.hasData) {
+              for (var doc in tripsSnapshot.data!.docs) {
+                final data = doc.data() as Map<String, dynamic>;
+                earnings += (data['earnings'] ?? 0).toDouble();
+              }
+            }
+
+            return StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('expenses')
+                  .where('driverId', whereIn: driverIds)
+                  .where('date', isEqualTo: today)
+                  .snapshots(),
+              builder: (context, expensesSnapshot) {
+                double expenses = 0;
+                if (expensesSnapshot.hasData) {
+                  for (var doc in expensesSnapshot.data!.docs) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    expenses += (data['amount'] ?? 0).toDouble();
+                  }
+                }
+
+                return _buildCard(earnings, expenses);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCard(double earnings, double expenses) {
+    final profit = earnings - expenses;
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Fleet Revenue Today',
+            style: TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'GHS ${profit.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 36,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const Text(
+            'Net Profit (All Drivers)',
+            style: TextStyle(color: Colors.white60, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Earnings: GHS ${earnings.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFFA5D6A7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'Expenses: GHS ${expenses.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFFFFAB91),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DriverPerformanceList extends StatelessWidget {
+  const _DriverPerformanceList();
+
+  @override
+  Widget build(BuildContext context) {
+    final ownerUid = FirebaseAuth.instance.currentUser?.uid;
+    final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where('ownerId', isEqualTo: ownerUid)
+          .snapshots(),
+      builder: (context, driversSnapshot) {
+        final drivers = driversSnapshot.data?.docs ?? [];
+
+        if (drivers.isEmpty) return const SizedBox();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Driver Performance Today',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...drivers.map((driverDoc) {
+              final driverData = driverDoc.data() as Map<String, dynamic>;
+              return _DriverPerformanceTile(
+                driverId: driverDoc.id,
+                name: driverData['name'] ?? 'Driver',
+                today: today,
+              );
+            }),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DriverPerformanceTile extends StatelessWidget {
+  final String driverId;
+  final String name;
+  final String today;
+
+  const _DriverPerformanceTile({
+    required this.driverId,
+    required this.name,
+    required this.today,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('trips')
+          .where('driverId', isEqualTo: driverId)
+          .where('date', isEqualTo: today)
+          .snapshots(),
+      builder: (context, snapshot) {
+        double earnings = 0;
+        int tripCount = 0;
+        if (snapshot.hasData) {
+          tripCount = snapshot.data!.docs.length;
+          for (var doc in snapshot.data!.docs) {
+            final data = doc.data() as Map<String, dynamic>;
+            earnings += (data['earnings'] ?? 0).toDouble();
+          }
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A2E42),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: const Color(0xFF4FC3F7).withOpacity(0.15),
+                child: Text(
+                  name[0].toUpperCase(),
+                  style: const TextStyle(
+                    color: Color(0xFF4FC3F7),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '$tripCount trip${tripCount != 1 ? 's' : ''} today',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                'GHS ${earnings.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFF66BB6A),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
