@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import '../trips/add_trip_screen.dart';
+import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:odolog/screens/sales/add_sale_screen.dart';
@@ -52,6 +53,25 @@ class DriverDashboard extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const AddExpenseScreen(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.directions_car,
+                    color: Color(0xFF4FC3F7),
+                  ),
+                  title: const Text(
+                    'Add My Vehicle',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AddVehicleScreen(),
                       ),
                     );
                   },

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import '../owner/add_driver_screen.dart';
+import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,6 +12,14 @@ class OwnerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B2A),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF4FC3F7),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
+        ),
+        child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -387,7 +396,9 @@ class _DriverPerformanceTile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: const Color(0xFF4FC3F7).withValues(alpha: 0.15),
+                backgroundColor: const Color(
+                  0xFF4FC3F7,
+                ).withValues(alpha: 0.15),
                 child: Text(
                   name[0].toUpperCase(),
                   style: const TextStyle(
