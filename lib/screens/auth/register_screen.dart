@@ -58,6 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'phone': phone,
             'email': email,
             'role': null,
+            'ownerId': null,
             'createdAt': FieldValue.serverTimestamp(),
           });
 
