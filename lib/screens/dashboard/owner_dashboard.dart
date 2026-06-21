@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import '../owner/add_driver_screen.dart';
+import '../vehicles/vehicles_screen.dart';
 import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,17 +49,34 @@ class OwnerDashboard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () => FirebaseAuth.instance.signOut(),
-                    child: const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Color(0xFF1A2E42),
-                      child: Icon(
-                        Icons.logout,
-                        color: Color(0xFF4FC3F7),
-                        size: 18,
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.directions_car_outlined,
+                          color: Color(0xFF4FC3F7),
+                        ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const VehiclesScreen(),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () => FirebaseAuth.instance.signOut(),
+                        child: const CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Color(0xFF1A2E42),
+                          child: Icon(
+                            Icons.logout,
+                            color: Color(0xFF4FC3F7),
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
