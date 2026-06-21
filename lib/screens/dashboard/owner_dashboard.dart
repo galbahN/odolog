@@ -387,7 +387,7 @@ class _DriverPerformanceTile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: const Color(0xFF4FC3F7).withOpacity(0.15),
+                backgroundColor: const Color(0xFF4FC3F7).withValues(alpha: 0.15),
                 child: Text(
                   name[0].toUpperCase(),
                   style: const TextStyle(
