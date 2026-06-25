@@ -5,6 +5,7 @@ import '../vehicles/vehicles_screen.dart';
 import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:odolog/widgets/maintenance_alerts.dart';
 
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
@@ -82,6 +83,21 @@ class OwnerDashboard extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
+
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('vehicles')
+                    .where(
+                      'ownerId',
+                      isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+                    )
+                    .snapshots(),
+                builder: (context, vehicleSnap) {
+                  final vehicleIds =
+                      vehicleSnap.data?.docs.map((d) => d.id).toList() ?? [];
+                  return MaintenanceAlerts(vehicleIds: vehicleIds);
+                },
+              ),
 
               const SizedBox(height: 24),
 

@@ -4,6 +4,7 @@ import '../trips/add_trip_screen.dart';
 import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:odolog/widgets/maintenance_alerts.dart';
 import 'package:odolog/screens/sales/add_sale_screen.dart';
 import 'package:odolog/screens/vehicles/vehicles_screen.dart';
 
@@ -150,6 +151,20 @@ class DriverDashboard extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+
+              const SizedBox(height: 24),
+
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('vehicles')
+                    .where('assignedDriverId', isEqualTo: uid)
+                    .snapshots(),
+                builder: (context, vehicleSnap) {
+                  final vehicleIds =
+                      vehicleSnap.data?.docs.map((d) => d.id).toList() ?? [];
+                  return MaintenanceAlerts(vehicleIds: vehicleIds);
+                },
               ),
 
               const SizedBox(height: 24),

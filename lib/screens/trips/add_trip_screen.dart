@@ -37,7 +37,7 @@ class _AddTripScreenState extends State<AddTripScreen> {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
-      final docRef = await FirebaseFirestore.instance.collection('trips').add({
+      await FirebaseFirestore.instance.collection('trips').add({
         'driverId': uid,
         'startPoint': start,
         'destination': destination,
@@ -47,9 +47,6 @@ class _AddTripScreenState extends State<AddTripScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      print(
-        'TRIP SAVED SUCCESSFULLY — Document ID: ${docRef.id}, UID used: $uid',
-      );
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
