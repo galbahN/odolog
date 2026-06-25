@@ -213,7 +213,7 @@ class _FleetStatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ownerUid = FirebaseAuth.instance.currentUser?.uid;
-    final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -334,7 +334,7 @@ class _DriverPerformanceList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ownerUid = FirebaseAuth.instance.currentUser?.uid;
-    final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance

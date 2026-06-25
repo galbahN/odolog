@@ -162,7 +162,7 @@ class DriverDashboard extends StatelessWidget {
                     .where(
                       'date',
                       isEqualTo: DateFormat(
-                        'dd-MM-yyyy',
+                        'yyyy-MM-dd',
                       ).format(DateTime.now()),
                     )
                     .snapshots(),
@@ -182,7 +182,7 @@ class DriverDashboard extends StatelessWidget {
                         .where(
                           'date',
                           isEqualTo: DateFormat(
-                            'dd-MM-yyyy',
+                            'yyyy-MM-dd',
                           ).format(DateTime.now()),
                         )
                         .snapshots(),
@@ -310,7 +310,7 @@ class DriverDashboard extends StatelessWidget {
                     .where(
                       'date',
                       isEqualTo: DateFormat(
-                        'dd-MM-yyyy',
+                        'yyyy-MM-dd',
                       ).format(DateTime.now()),
                     )
                     .snapshots(),
