@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/auth/login_screen.dart';
+import '../services/notification_service.dart';
 import 'screens/dashboard/owner_dashboard.dart';
 import 'screens/auth/role_selection_screen.dart';
 import 'screens/dashboard/driver_dashboard.dart';
@@ -20,6 +21,7 @@ class AuthGate extends StatelessWidget {
         }
 
         final uid = authSnap.data!.uid;
+        registerDeviceForNotifications();
 
         // Logged in — now check their role from Firestore
         return FutureBuilder<DocumentSnapshot>(
@@ -28,7 +30,9 @@ class AuthGate extends StatelessWidget {
             if (!userSnap.hasData) {
               return const Scaffold(
                 backgroundColor: Color(0xFF0D1B2A),
-                body: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))),
+                body: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF4FC3F7)),
+                ),
               );
             }
 

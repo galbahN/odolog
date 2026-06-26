@@ -1,1 +1,59 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"odolog-v1","appId":"1:93803328175:android:20b1453752b239a1abda5a","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"odolog-v1","appId":"1:93803328175:ios:ff5d8cf6f39da1f6abda5a","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"odolog-v1","appId":"1:93803328175:ios:ff5d8cf6f39da1f6abda5a","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"odolog-v1","configurations":{"android":"1:93803328175:android:20b1453752b239a1abda5a","ios":"1:93803328175:ios:ff5d8cf6f39da1f6abda5a","macos":"1:93803328175:ios:ff5d8cf6f39da1f6abda5a","web":"1:93803328175:web:634088761cd7063babda5a","windows":"1:93803328175:web:4d33f92d2b555989abda5a"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "odolog-v1",
+          "appId": "1:93803328175:android:20b1453752b239a1abda5a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "odolog-v1",
+          "appId": "1:93803328175:ios:ff5d8cf6f39da1f6abda5a",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "odolog-v1",
+          "appId": "1:93803328175:ios:ff5d8cf6f39da1f6abda5a",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "odolog-v1",
+          "configurations": {
+            "android": "1:93803328175:android:20b1453752b239a1abda5a",
+            "ios": "1:93803328175:ios:ff5d8cf6f39da1f6abda5a",
+            "macos": "1:93803328175:ios:ff5d8cf6f39da1f6abda5a",
+            "web": "1:93803328175:web:634088761cd7063babda5a",
+            "windows": "1:93803328175:web:4d33f92d2b555989abda5a"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
+}
