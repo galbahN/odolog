@@ -1,32 +1,89 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as admin from "firebase-admin";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+admin.initializeApp();
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+const db = admin.firestore();
+const messaging = admin.messaging();
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+// Runs every day at 8:00 AM Accra time
+export const checkMaintenanceReminders = onSchedule(
+  {
+    schedule: "0 8 * * *",
+    timeZone: "Africa/Accra",
+  },
+  async () => {
+    const today = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(today.getDate() + 7);
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    const todayStr = today.toISOString().split("T")[0];
+    const sevenDaysStr = sevenDaysFromNow.toISOString().split("T")[0];
+
+    const maintenanceSnap = await db
+      .collection("maintenance")
+      .where("nextDueDate", "<=", sevenDaysStr)
+      .get();
+
+    if (maintenanceSnap.empty) {
+      console.log("No maintenance records due soon.");
+      return;
+    }
+
+    for (const doc of maintenanceSnap.docs) {
+      const record = doc.data();
+      const vehicleId = record.vehicleId;
+      const serviceType = record.serviceType;
+      const nextDueDate = record.nextDueDate;
+      const isOverdue = nextDueDate < todayStr;
+
+      const vehicleDoc = await db.collection("vehicles").doc(vehicleId).get();
+      if (!vehicleDoc.exists) continue;
+
+      const vehicle = vehicleDoc.data()!;
+      const ownerId = vehicle.ownerId;
+      const assignedDriverId = vehicle.assignedDriverId;
+
+      const uidsToNotify = new Set<string>();
+      if (ownerId) uidsToNotify.add(ownerId);
+      if (assignedDriverId) uidsToNotify.add(assignedDriverId);
+
+      for (const uid of uidsToNotify) {
+        const userDoc = await db.collection("users").doc(uid).get();
+        if (!userDoc.exists) continue;
+
+        const fcmToken = userDoc.data()?.fcmToken;
+        if (!fcmToken) continue;
+
+        const title = isOverdue
+          ? `⚠️ Overdue: ${serviceType}`
+          : `🔧 Service Due Soon: ${serviceType}`;
+
+        const body = isOverdue
+          ? `This service was due on ${nextDueDate}. Please schedule it immediately.`
+          : `This service is due on ${nextDueDate}. Schedule it within 7 days.`;
+
+        try {
+          await messaging.send({
+            token: fcmToken,
+            notification: { title, body },
+            android: {
+              notification: {
+                channelId: "maintenance_reminders",
+                priority: "high",
+              },
+            },
+            apns: {
+              payload: {
+                aps: { sound: "default" },
+              },
+            },
+          });
+          console.log(`Notification sent to ${uid} for ${serviceType}`);
+        } catch (err) {
+          console.error(`Failed to send to ${uid}:`, err);
+        }
+      }
+    }
+  }
+);
