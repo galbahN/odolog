@@ -3,6 +3,10 @@
         android:label="odolog"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+          android:name="com.google.firebase.messaging.default_notification_channel_id"
+          android:value="maintenance_reminders"
+        />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -19,9 +23,7 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
-              android:name="com.google.firebase.messaging.default_notification_channel_id"
-              android:value="maintenance_reminders"
-              />
+            />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
