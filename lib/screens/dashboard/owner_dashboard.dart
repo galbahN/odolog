@@ -6,6 +6,7 @@ import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:odolog/widgets/maintenance_alerts.dart';
+import 'package:odolog/widgets/assign_vehicle_sheet.dart';
 
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
@@ -202,6 +203,20 @@ class OwnerDashboard extends StatelessWidget {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.directions_car_outlined,
+                                color: Color(0xFF4FC3F7),
+                                size: 20,
+                              ),
+                              onPressed: () => showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
+                                builder: (_) =>
+                                    AssignVehicleSheet(driverId: doc.id),
                               ),
                             ),
                           ],

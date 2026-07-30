@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/assign_vehicle_sheet.dart';
 import '../maintenance/add_maintenance_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -23,6 +24,17 @@ class VehicleDetailScreen extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(vehicleLabel, style: const TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_add_alt, color: Color(0xFF4FC3F7)),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              isScrollControlled: true,
+              builder: (_) => AssignVehicleSheet(vehicleId: vehicleId),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xFF4FC3F7),
@@ -36,14 +48,19 @@ class VehicleDetailScreen extends StatelessWidget {
           ),
         ),
         icon: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
-        label: const Text('Log Service', style: TextStyle(color: Color(0xFF0D1B2A), fontWeight: FontWeight.w700)),
+        label: const Text(
+          'Log Service',
+          style: TextStyle(
+            color: Color(0xFF0D1B2A),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // Vehicle Info Card
             Container(
               padding: const EdgeInsets.all(20),
@@ -58,18 +75,32 @@ class VehicleDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${data['year']} $vehicleLabel',
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                  Text(
+                    '${data['year']} $vehicleLabel',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  Text('${data['plate']} • ${data['color']}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text(
+                    '${data['plate']} • ${data['color']}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 24),
-            const Text('Service History',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+            const Text(
+              'Service History',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 12),
 
             StreamBuilder<QuerySnapshot>(
@@ -87,7 +118,10 @@ class VehicleDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Center(
-                      child: Text('No service records yet', style: TextStyle(color: Colors.white38)),
+                      child: Text(
+                        'No service records yet',
+                        style: TextStyle(color: Colors.white38),
+                      ),
                     ),
                   );
                 }
@@ -108,15 +142,30 @@ class VehicleDetailScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(m['serviceType'] ?? '',
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                                Text('${m['serviceDate']} • ${m['mileage']} km',
-                                  style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                                Text(
+                                  m['serviceType'] ?? '',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  '${m['serviceDate']} • ${m['mileage']} km',
+                                  style: const TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          Text('GHS ${(m['cost'] ?? 0).toStringAsFixed(2)}',
-                            style: const TextStyle(color: Color(0xFF66BB6A), fontWeight: FontWeight.w700)),
+                          Text(
+                            'GHS ${(m['cost'] ?? 0).toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: Color(0xFF66BB6A),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                     );
