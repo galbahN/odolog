@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../trips/add_trip_screen.dart';
 import '../vehicles/add_vehicle_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../analytics/driver_analytics_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:odolog/widgets/maintenance_alerts.dart';
 import 'package:odolog/screens/sales/add_sale_screen.dart';
@@ -94,35 +95,49 @@ class DriverDashboard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Good morning 👋',
-                        style: TextStyle(color: Colors.white54, fontSize: 13),
-                      ),
-                      const SizedBox(height: 2),
-                      StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(uid)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          final name = snapshot.data?.get('name') ?? 'Driver';
-                          return Text(
-                            name,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Good morning 👋',
+                          style: TextStyle(color: Colors.white54, fontSize: 13),
+                        ),
+                        const SizedBox(height: 2),
+                        StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            final name = snapshot.data?.get('name') ?? 'Driver';
+                            return Text(
+                              name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.bar_chart_outlined,
+                          color: Colors.white54,
+                        ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DriverAnalyticsScreen(),
+                          ),
+                        ),
+                      ),
                       IconButton(
                         icon: const Icon(
                           Icons.directions_car_outlined,

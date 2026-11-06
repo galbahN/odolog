@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:odolog/widgets/maintenance_alerts.dart';
 import 'package:odolog/widgets/assign_vehicle_sheet.dart';
+import 'package:odolog/screens/analytics/owner_analytics_screen.dart';
 
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
@@ -53,6 +54,19 @@ class OwnerDashboard extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.bar_chart_outlined,
+                          color: Colors.white54,
+                        ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OwnerAnalyticsScreen(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
                       IconButton(
                         icon: const Icon(
                           Icons.directions_car_outlined,
